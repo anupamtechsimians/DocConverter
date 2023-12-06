@@ -1,11 +1,12 @@
-# Use an official OpenJDK runtime as a parent image
+# Stage 1: Build the application
+FROM adoptopenjdk:11-jdk-hotspot as build
+WORKDIR /app
+COPY . .
+RUN ./mvnw clean install
+
+# Stage 2: Run the application
 FROM adoptopenjdk:11-jre-hotspot
-
-# Copy the JAR file into the container
-COPY target/my-spring-boot-app.jar /app.jar
-
-# Make port 8080 available to the world outside this container
+WORKDIR /app
+COPY --from=build /app/target/my-spring-boot-app.jar /app.jar
 EXPOSE 8080
-
-# Run the application when the container launches
 CMD ["java", "-jar", "/app.jar"]
