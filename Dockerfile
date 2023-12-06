@@ -1,13 +1,25 @@
-# Stage 1: Build the application
-FROM adoptopenjdk:11-jdk-hotspot as build
+# Use an official OpenJDK runtime as a parent image
+FROM adoptopenjdk:11-jdk-hotspot
+
+# Set the working directory
 WORKDIR /app
+
+# Copy Maven wrapper and POM file
+COPY mvnw .
+COPY mvnw.cmd .
+COPY pom.xml .
+
+# Copy the project files
 COPY . .
-RUN chmod +x mvnw   # Grant execute permission to the script
+
+# Build the project
 RUN ./mvnw clean install
 
-# Stage 2: Run the application
-FROM adoptopenjdk:11-jre-hotspot
-WORKDIR /app
-COPY --from=build /app/target/my-spring-boot-app.jar /app.jar
+# Copy the application JAR file
+COPY target/my-spring-boot-app.jar /app.jar
+
+# Expose port 8080
 EXPOSE 8080
+
+# Run the application
 CMD ["java", "-jar", "/app.jar"]
