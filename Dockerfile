@@ -23,7 +23,7 @@ FROM openjdk:17-jdk-slim AS runtime
 WORKDIR /app
 
 # Copy the JAR file from the build stage to the runtime stage
-COPY --from=build /app/target/your-application-name.jar ./app.jar
+COPY --from=build /app/target/docConverter.jar ./app.jar
 
 # Expose the port that your application will run on
 EXPOSE 8080
