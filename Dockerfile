@@ -10,6 +10,9 @@ COPY pom.xml .
 # Download dependencies and plugins, this step will be cached if the pom.xml file hasn't changed
 RUN mvn dependency:go-offline
 
+RUN mvn clean install -DskipTests
+
+
 # Copy the application source code to the container
 COPY src ./src
 
