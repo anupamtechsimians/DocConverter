@@ -2,6 +2,7 @@
 FROM adoptopenjdk:11-jdk-hotspot as build
 WORKDIR /app
 COPY . .
+RUN chmod +x mvnw   # Grant execute permission to the script
 RUN ./mvnw clean install
 
 # Stage 2: Run the application
