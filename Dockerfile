@@ -1,25 +1,32 @@
-# Use an official OpenJDK runtime as a parent image
-FROM adoptopenjdk:11-jdk-hotspot
+# Use the official Maven image as a base image
+FROM maven:3.8.4-openjdk-17-slim AS build
 
-# Set the working directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy Maven wrapper and POM file
-COPY mvnw .
-COPY mvnw.cmd .
+# Copy the pom.xml file to the container
 COPY pom.xml .
 
-# Copy the project files
-COPY . .
+# Download dependencies and plugins, this step will be cached if the pom.xml file hasn't changed
+RUN mvn dependency:go-offline
 
-# Build the project
-RUN ./mvnw clean install
+# Copy the application source code to the container
+COPY src ./src
 
-# Copy the application JAR file
-COPY target/my-spring-boot-app.jar /app.jar
+# Build the application
+RUN mvn package -DskipTests
 
-# Expose port 8080
+# Use a smaller base image for the runtime environment
+FROM openjdk:17-jdk-slim AS runtime
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the JAR file from the build stage to the runtime stage
+COPY --from=build /app/target/your-application-name.jar ./app.jar
+
+# Expose the port that your application will run on
 EXPOSE 8080
 
-# Run the application
-CMD ["java", "-jar", "/app.jar"]
+# Command to run the application
+CMD ["java", "-jar", "app.jar"]
